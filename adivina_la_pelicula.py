@@ -1,7 +1,7 @@
 import pyodbc
 import sqlite3
 # Conexion a la base de datos
-conn = pyodbc.connect('DRIVER={SQL Server};''SERVER=PRACTIAARNB1677;''DATABASE=preguntas;''UID=sa;PWD=Mada3983')
+conn = pyodbc.connect('DRIVER={SQL Server};''SERVER=PRACTIAARNB1677;''DATABASE=preguntas;''UID=sa;PWD=colocarPassword')
 #conn = pyodbc.connect('Driver={SQL Server};''Server=PRACTIAARNB1677;''Database=preguntas;''Trusted_Connection=yes;')
 
 # Obtener un cursor para realizar operaciones en la base de datos

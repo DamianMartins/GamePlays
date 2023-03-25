@@ -5,7 +5,7 @@ import tkinter as tk
 
 def obtener_pregunta():
     #conectar python a base de datos SQL server
-    conn = pyodbc.connect('DRIVER={SQL Server};SERVER=PRACTIAARNB1677;DATABASE=preguntas;UID=sa;PWD=Mada3983')
+    conn = pyodbc.connect('DRIVER={SQL Server};SERVER=PRACTIAARNB1677;DATABASE=preguntas;UID=sa;PWD=colocarPass')
 
     # conectar a la base de datos
     db = sqlite3.connect("preguntas.db")
