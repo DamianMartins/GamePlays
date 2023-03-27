@@ -1,9 +1,94 @@
 from logging import root
 import tkinter as tk
+from tkinter import ttk
 from tkinter import END, Toplevel, StringVar
 from tkinter.ttk import Button, Label, Entry
 from tkinter import Listbox
-from preguntados import juego_preguntados
+from database import DB
+# from preguntados import juego_preguntados
+
+class VentanaCantidad(tk.Toplevel):
+    def __inti__(self, parent):
+        super().__init__(parent)
+
+        self.title = "Cantidad de usuarios"
+
+
+class App(tk.Tk):
+    def __init__(self):
+        super().__init__()
+
+        main_frame = tk.Frame(self, padx=3, pady=3)
+        
+        # inputs
+        frame_inputs = self.get_inputs_frame(main_frame)
+        frame_inputs.grid(row=0, column=0)
+
+        # Table
+        frame_table = self.get_table_frame(main_frame)
+        frame_table.grid(row=1, column=0)
+
+        main_frame.grid(row=0,column=0)
+
+        # center app
+        center_width = self.winfo_screenwidth()//2
+        center_height = self.winfo_screenheight()//2
+        width = 300
+        heigth = 450
+        self.geometry(f"{width}x{heigth}+{center_width-(width//2)}+{center_height-(heigth//2)}")
+
+
+    def get_inputs_frame(self, parent):
+        """Genera el frame para el ingreso de los nombres"""
+        inputs_frame = ttk.Frame(parent)
+
+        self.nombre_var = tk.StringVar()
+
+        ttk.Label(inputs_frame, text= 'Nombre').grid(row=0, column=0)
+        ttk.Entry(inputs_frame, textvariable=self.nombre_var).grid(row=0, column=1)
+        ttk.Button(inputs_frame, text="Agregar", command=self.add_nombre).grid(row=0, column=2)
+
+        return inputs_frame
+
+
+    def get_table_frame(self, parent):
+        """genera el frame para el treeview (tabla)"""
+
+        frame_table = ttk.Frame(parent)
+
+        self.table = ttk.Treeview(frame_table, columns=('name',), show='headings')
+
+        self.table.heading('name', text='Nombre')
+        self.table.grid(row=0, column=0, sticky=tk.NSEW)
+
+        return frame_table
+    
+
+    def add_nombre(self):
+        nombre = self.nombre_var.get()
+        self.table.insert('', tk.END, values=(nombre))
+        DB.insert_name(name=nombre)
+
+    def print_nombres(self):
+        pass
+
+
+def abrir_ventana_cantidad():
+    # Crear ventana modal
+    cantidad_ventana = Toplevel()
+    cantidad_ventana.title("Cantidad de usuarios")
+    cantidad_ventana.grab_set()
+    
+    # Crear widgets
+    etiqueta_cantidad = Label(cantidad_ventana, text="Ingrese la cantidad de usuarios:")
+    etiqueta_cantidad.pack()
+    entrada_cantidad = Entry(cantidad_ventana)
+    entrada_cantidad.pack()
+    
+    boton_aceptar = Button(cantidad_ventana, text="Aceptar", command=aceptar_cantidad)
+    boton_aceptar.pack()
+
+
 
 def abrir_ventana_juegos(nombres):
     # Crear ventana modal
@@ -56,28 +141,23 @@ def abrir_ventana_nombres(cantidad):
     boton_aceptar = Button(nombres_ventana, text="Aceptar", command=aceptar_nombres)
     boton_aceptar.pack()
 
-def abrir_ventana_cantidad():
-    # Crear ventana modal
-    cantidad_ventana = Toplevel()
-    cantidad_ventana.title("Cantidad de usuarios")
-    cantidad_ventana.grab_set()
-    
-    # Crear widgets
-    etiqueta_cantidad = Label(cantidad_ventana, text="Ingrese la cantidad de usuarios:")
-    etiqueta_cantidad.pack()
-    entrada_cantidad = Entry(cantidad_ventana)
-    entrada_cantidad.pack()
-    
+
+
     # Llamar a función abrir_ventana_nombres cuando se haga click en el botón Aceptar
     def aceptar_cantidad():
         cantidad = entrada_cantidad.get()
         abrir_ventana_nombres(int(cantidad))
         cantidad_ventana.destroy()
-    boton_aceptar = Button(cantidad_ventana, text="Aceptar", command=aceptar_cantidad)
-    boton_aceptar.pack()
 
-# Crear widget para abrir ventana modal de cantidad de usuarios
-root = tk.Tk()
-boton_cantidad = tk.Button(root, text="Cantidad de usuarios", command=abrir_ventana_cantidad)
-boton_cantidad.pack()
-root.mainloop()
+
+
+if __name__ == '__main__':
+    DB.exec("""
+    create table if not exists gamers (
+        id integer primary key,
+        name varchar
+    );
+    """)
+    DB.clean_table()
+    app = App()
+    app.mainloop()
