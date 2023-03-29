@@ -1,11 +1,10 @@
 import sqlite3
 import random
-import pyodbc
 import tkinter as tk
+from tkinter import messagebox
 
 def obtener_pregunta():
     #conectar python a base de datos SQL server
-    conn = pyodbc.connect('DRIVER={SQL Server};SERVER=PRACTIAARNB1677;DATABASE=preguntas;UID=sa;PWD=Password')
 
     # conectar a la base de datos
     db = sqlite3.connect("preguntas.db")
@@ -13,12 +12,28 @@ def obtener_pregunta():
     # obtener un cursor para realizar operaciones en la base de datos
     cursor = db.cursor()
 
+    # Si la tabla preguntas no existe, crearla
+    # TODO: Definir la tabla `preguntas`
+    cursor.execute("""create table if not exists preguntas (
+        id integer primary key,
+        pregunta text,
+        opcion_a text,
+        opcion_b text,
+        opcion_c text,
+        respuesta text)
+    """)
+
     # obtener la cantidad de preguntas en la base de datos
-    cursor.execute("SELECT COUNT(*) FROM [preguntas].[dbo].[preguntas]")
+    cursor.execute("SELECT COUNT(*) FROM preguntas")
     num_preguntas = cursor.fetchone()[0]
 
-    # elegir un número aleatorio entre 0 y el número de preguntas
-    num_aleatorio = random.randint(0, num_preguntas - 1)
+    # Chequeo de que hay preguntas en la base de datos
+    if num_preguntas == 0:
+        messagebox.showerror(message="No hay preguntas en la base de datos.")
+        raise AssertionError("No hay preguntas en la base de datos.")
+
+    # elegir un número aleatorio entre 1 y el número de preguntas
+    num_aleatorio = random.randint(1, num_preguntas) # Los id usualmente empiezan en 1
 
     # obtener la pregunta correspondiente al número aleatorio
     cursor.execute("SELECT * FROM preguntas WHERE id={}".format(num_aleatorio))
